@@ -313,8 +313,9 @@ def SNP(x, y):
     
     # Adaptive h_start adjustment
     i0 = 1
-    while i0 <= 15:
-        if i0 == 15:
+    i0max = 15
+    while i0 <= i0max:
+        if i0 == i0max:
             print("Last chance for change h_start")
         
         # Initial weight matrix with h_start
@@ -346,7 +347,7 @@ def SNP(x, y):
             i0 = i0 + 1
             print("new bigger h_start:", h_start)
         else:
-            i0 = 11
+            i0 = i0max + 1
     
     elapsed_k = time.time() - start_time
     elapsed = elapsed_h + elapsed_k
