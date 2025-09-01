@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 
 # Generate sample data
 np.random.seed(123)
-n = 1000
+n = 2000
 x = np.sort(np.random.uniform(0, 1, n))
 y = np.sin(2*np.pi*x) + np.random.normal(0, 0.35, n)
 
