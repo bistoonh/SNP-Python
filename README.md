@@ -64,6 +64,9 @@ This reformulation preserves the adaptivity of GCV while converting costly conti
 - `SNP(x, y)`: Main Stepwise Noise Peeling algorithm
 - `DGCV(x, y)`: Direct Generalized Cross-Validation (reference method)  
 - `construct_W(x, h)`: Construct Gaussian kernel weight matrix
+- `example_stepwise()`: Stepwise function demonstration
+- `example_wavy()`: Complex wavy function demonstration
+- `example_california_housing()`: Real dataset example
 
 ## Performance
 
