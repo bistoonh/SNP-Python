@@ -28,9 +28,9 @@ import matplotlib.pyplot as plt
 
 # Generate sample data
 np.random.seed(123)
-n = 2000
+n = 1000
 x = np.sort(np.random.uniform(0, 1, n))
-y = np.sin(2*np.pi*x) + np.random.normal(0, 0.1, n)
+y = np.sin(2*np.pi*x) + np.random.normal(0, 0.35, n)
 
 # Apply SNP smoothing
 snp_result = SNP(x, y)
@@ -48,8 +48,14 @@ plt.legend()
 plt.show()
 
 # Performance comparison
+y_true = np.sin(2*np.pi*x)  # True function without noise
+rmse_snp = np.sqrt(np.mean((snp_result['y_k_opt'] - y_true)**2))
+rmse_dgcv = np.sqrt(np.mean((dgcv_result['y_h_opt'] - y_true)**2))
+
 print(f"SNP time: {snp_result['time_elapsed']:.4f} seconds")
 print(f"DGCV time: {dgcv_result['time_elapsed']:.4f} seconds")
+print(f"SNP RMSE: {rmse_snp:.4f}")
+print(f"DGCV RMSE: {rmse_dgcv:.4f}")
 ```
 
 ## Key Features
