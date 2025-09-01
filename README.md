@@ -15,7 +15,7 @@ pip install snp
 
 For development installation:
 ```bash
-git clone https://github.com/yourusername/snp.git
+git clone https://github.com/bistoonh/snp.git
 cd snp
 pip install -e ".[dev]"
 ```
