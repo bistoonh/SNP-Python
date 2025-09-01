@@ -77,10 +77,10 @@ For datasets with n > 1000, SNP typically shows:
 The package includes comprehensive examples in the `examples/` directory:
 
 ```python
-from examples.paper_examples import run_all_examples
+from examples.example_stepwise import example_stepwise
 
 # Run all paper examples
-run_all_examples()
+example_stepwise()
 ```
 
 ## Requirements
