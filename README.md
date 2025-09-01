@@ -23,7 +23,7 @@ pip install snp-nw
 
 ```python
 import numpy as np
-from snp import SNP, DGCV, example_stepwise
+from snp import SNP, DGCV
 import matplotlib.pyplot as plt
 
 # Generate sample data
@@ -38,8 +38,18 @@ snp_result = SNP(x, y)
 # Compare with traditional DGCV
 dgcv_result = DGCV(x, y)
 
-# Or run paper examples directly
-example_stepwise()
+# Plot results
+plt.figure(figsize=(10, 6))
+plt.scatter(x, y, s=5, c="gray", alpha=0.7, label="Data")
+plt.plot(x, snp_result['y_k_opt'], 'r-', linewidth=2, label="SNP")
+plt.plot(x, dgcv_result['y_h_opt'], 'b--', linewidth=2, label="DGCV")
+plt.title("SNP vs DGCV Comparison")
+plt.legend()
+plt.show()
+
+# Performance comparison
+print(f"SNP time: {snp_result['time_elapsed']:.4f} seconds")
+print(f"DGCV time: {dgcv_result['time_elapsed']:.4f} seconds")
 ```
 
 ## Key Features
