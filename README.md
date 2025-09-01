@@ -16,7 +16,7 @@ You can install the development version of SNP from GitHub with:
 pip install git+https://github.com/bistoonh/SNP-Python.git
 
 # Or install from PyPI (when published)
-pip install SNP
+pip install snp-nw
 ```
 
 ## Quick Start
