@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="SNP",
+    name="snp",
     version="0.1.0",
     author="Bistoon Hosseini",
     author_email="bistoon.hosseini@gmail.com",
@@ -32,7 +32,7 @@ setup(
     ],
     package_dir={"": "src"},
     packages=find_packages(where="src") + ["examples"],
-    package_data={"examples": ["*.py"]},
+    py_modules=["examples.paper_examples"],
     python_requires=">=3.7",
     install_requires=[
         "numpy>=1.19.0",

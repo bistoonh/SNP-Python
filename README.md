@@ -23,7 +23,7 @@ pip install SNP
 
 ```python
 import numpy as np
-from SNP import SNP, DGCV, example_stepwise
+from snp import SNP, DGCV, example_stepwise
 import matplotlib.pyplot as plt
 
 # Generate sample data
@@ -74,12 +74,12 @@ For datasets with n > 1000, SNP typically shows:
 
 ## Examples
 
-The package includes comprehensive examples in the `examples/` directory:
+The package includes comprehensive examples that demonstrate SNP performance:
 
 ```python
-from examples.example_stepwise import example_stepwise
+from snp import example_stepwise
 
-# Run all paper examples
+# Run stepwise function example
 example_stepwise()
 ```
 
