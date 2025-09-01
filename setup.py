@@ -41,6 +41,7 @@ setup(
     extras_require={
         "examples": ["matplotlib>=3.3.0", "pandas>=1.2.0"],
         "dev": ["pytest>=6.0", "pytest-cov>=2.10.0"],
+        "all": ["matplotlib>=3.3.0", "pandas>=1.2.0", "pytest>=6.0", "pytest-cov>=2.10.0"],
     },
     keywords="regression, smoothing, bandwidth-selection, nadaraya-watson, kernel-regression",
 )

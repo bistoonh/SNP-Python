@@ -1,66 +1,113 @@
-# SNP-Python: Stepwise Noise Peeling for Nadaraya–Watson Regression
+# SNP: Stepwise Noise Peeling for Nadaraya-Watson Regression
 
-The **snp-nw** package implements the Stepwise Noise Peeling algorithm that bypasses bandwidth selection in Nadaraya-Watson regression by using iterative smoothing. SNP provides a scalable alternative to Direct Generalized Cross-Validation (DGCV) by converting continuous bandwidth optimization into discrete iteration selection, dramatically reducing computational cost while maintaining statistical equivalence.
+<!-- badges: start -->
+[![Python package](https://github.com/bistoonh/SNP-Python/workflows/Python%20package/badge.svg)](https://github.com/bistoonh/SNP-Python/actions)
+[![PyPI version](https://badge.fury.io/py/SNP.svg)](https://badge.fury.io/py/SNP)
+<!-- badges: end -->
+
+The **SNP** package implements the Stepwise Noise Peeling algorithm that bypasses bandwidth selection in Nadaraya-Watson regression by using iterative smoothing. SNP provides a scalable alternative to Direct Generalized Cross-Validation (DGCV) by converting continuous bandwidth optimization into discrete iteration selection, dramatically reducing computational cost while maintaining statistical equivalence.
 
 ## Installation
 
-Install from PyPI (recommended):
+You can install the development version of SNP from GitHub with:
 
 ```bash
-pip install snp-nw
-```
-
-Or install the latest development version from GitHub:
-
-```bash
+# Install from GitHub
 pip install git+https://github.com/bistoonh/SNP-Python.git
+
+# Or install from PyPI (when published)
+pip install SNP
 ```
 
 ## Quick Start
 
 ```python
 import numpy as np
+from SNP import SNP, DGCV, example_stepwise
 import matplotlib.pyplot as plt
-from snp import SNP, DGCV
 
 # Generate sample data
 np.random.seed(123)
 n = 2000
-x = np.sort(np.random.rand(n))
-y = np.sin(2*np.pi*x) + np.random.normal(0, 0.1, size=n)
+x = np.sort(np.random.uniform(0, 1, n))
+y = np.sin(2*np.pi*x) + np.random.normal(0, 0.1, n)
 
 # Apply SNP smoothing
 snp_result = SNP(x, y)
 
-# Compare with DGCV
+# Compare with traditional DGCV
 dgcv_result = DGCV(x, y)
 
-# Print performance comparison
-print("SNP:  h_start=%.4f, k_opt=%d, time=%.4fs" %
-      (snp_result["h_start"], snp_result["k_opt"], snp_result["time_elapsed"]))
-print("DGCV: h_opt=%.4f, time=%.4fs" %
-      (dgcv_result["h_opt_gcv"], dgcv_result["time_elapsed"]))
-
-# Plot results
-plt.scatter(x, y, s=8, c="gray", label="Data")
-plt.plot(x, snp_result["y_k_opt"], c="red", lw=2, label="SNP")
-plt.plot(x, dgcv_result["y_h_opt"], c="blue", lw=2, label="DGCV")
-plt.legend()
-plt.title("SNP vs DGCV Comparison")
-plt.show()
+# Or run paper examples directly
+example_stepwise()
 ```
 
 ## Key Features
 
-- ⚡ **Fast**: Orders of magnitude faster than DGCV for large datasets  
-- 📊 **Accurate**: Statistically equivalent results to DGCV  
-- 🎯 **Adaptive**: Automatically adjusts bandwidth through iterative process  
-- 🔧 **Robust**: Handles edge cases and various data sizes  
-- 📖 **Well-documented**: Comprehensive help files and examples  
+- **⚡ Fast**: Orders of magnitude faster than DGCV for large datasets
+- **📊 Accurate**: Statistically equivalent results to DGCV
+- **🎯 Adaptive**: Automatically adjusts bandwidth through iterative process
+- **🔧 Robust**: Handles edge cases and various data sizes
+- **📖 Well-documented**: Comprehensive help files and examples
+
+## Algorithm Overview
+
+SNP operates in two phases:
+
+1. **Phase I**: Constructs a conservative initial bandwidth using random slices of data and lightweight GCV within each slice
+2. **Phase II**: Fixes the smoothing operator and repeatedly applies it, selecting optimal iterations via discrete GCV
+
+This reformulation preserves the adaptivity of GCV while converting costly continuous bandwidth search into lightweight discrete selection.
+
+## Main Functions
+
+- `SNP(x, y)`: Main Stepwise Noise Peeling algorithm
+- `DGCV(x, y)`: Direct Generalized Cross-Validation (reference method)  
+- `construct_W(x, h)`: Construct Gaussian kernel weight matrix
+
+## Performance
+
+For datasets with n > 1000, SNP typically shows:
+- **Speed**: Orders of magnitude faster than DGCV
+- **Accuracy**: < 1% difference in RMSE compared to DGCV
+- **Memory**: More efficient memory usage due to iterative approach
+
+## Examples
+
+The package includes comprehensive examples in the `examples/` directory:
+
+```python
+from examples.paper_examples import run_all_examples
+
+# Run all paper examples
+run_all_examples()
+```
+
+## Requirements
+
+- Python >= 3.7
+- numpy >= 1.19.0
+- scipy >= 1.6.0
+
+Optional dependencies for examples:
+- matplotlib >= 3.3.0 (for plotting)
+- pandas >= 1.2.0 (for California housing example)
+
+## Citation
+
+If you use this package in your research, please cite:
+
+```
+
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Issues
 

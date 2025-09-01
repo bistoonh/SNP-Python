@@ -15,9 +15,10 @@ Key Features:
 """
 
 from .core import SNP, DGCV, construct_W
+from .examples import example_stepwise, example_wavy, example_california_housing, run_all_examples
 
 __version__ = "0.1.0"
 __author__ = "Bistoon Hosseini"
 __email__ = "bistoon.hosseini@gmail.com"
 
-__all__ = ["SNP", "DGCV", "construct_W"]
+__all__ = ["SNP", "DGCV", "construct_W", "example_stepwise", "example_wavy", "example_california_housing"]
