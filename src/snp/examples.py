@@ -261,7 +261,7 @@ def example_california_housing():
         snp_result = SNP(x, y)
         
         # Apply DGCV
-        dgcv_result = DGCV(x, y, num_h_points=30)
+        dgcv_result = DGCV(x, y, num_h_points=50)
         
         # Calculate RMSE (no true function, so use cross-method comparison)
         rmse_diff = np.sqrt(np.mean((snp_result['y_k_opt'] - dgcv_result['y_h_opt'])**2))
