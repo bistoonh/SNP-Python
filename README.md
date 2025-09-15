@@ -15,7 +15,7 @@ You can install the development version of SNP from GitHub with:
 # Install from GitHub
 pip install git+https://github.com/bistoonh/SNP-Python.git
 
-# Or install from PyPI
+# Or install from PyPI (when published)
 pip install pysnp
 ```
 
@@ -32,7 +32,7 @@ n = 2000
 x = np.sort(np.random.uniform(0, 1, n))
 y = np.sin(2*np.pi*x) + np.random.normal(0, 0.35, n)
 
-# Apply SNP smoothing
+# Apply SNP smoothing with default parameters
 snp_result = SNP(x, y)
 
 # Compare with traditional DGCV
@@ -58,27 +58,47 @@ print(f"SNP RMSE: {rmse_snp:.4f}")
 print(f"DGCV RMSE: {rmse_dgcv:.4f}")
 ```
 
+## Parameter Tuning
+
+SNP provides two key parameters for balancing speed and accuracy:
+
+```python
+# Faster computation (fewer bandwidth candidates and slices)
+snp_fast = SNP(x, y, num_h_points=20, num_slices=30)
+
+# More thorough search (more bandwidth candidates and slices)  
+snp_thorough = SNP(x, y, num_h_points=60, num_slices=100)
+
+# Performance comparison
+print(f"Fast SNP time: {snp_fast['time_elapsed']:.4f} seconds")
+print(f"Thorough SNP time: {snp_thorough['time_elapsed']:.4f} seconds")
+```
+
 ## Key Features
 
-- **⚡ Fast**: Orders of magnitude faster than DGCV for large datasets
-- **📊 Accurate**: Statistically equivalent results to DGCV
-- **🎯 Adaptive**: Automatically adjusts bandwidth through iterative process
-- **🔧 Robust**: Handles edge cases and various data sizes
-- **📖 Well-documented**: Comprehensive help files and examples
+- **Fast**: Orders of magnitude faster than DGCV for large datasets
+- **Accurate**: Statistically equivalent results to DGCV
+- **Adaptive**: Automatically adjusts bandwidth through iterative process
+- **Configurable**: Tunable parameters for speed vs accuracy trade-offs
+- **Robust**: Handles edge cases and various data sizes
+- **Well-documented**: Comprehensive help files and examples
 
 ## Algorithm Overview
 
 SNP operates in two phases:
 
 1. **Phase I**: Constructs a conservative initial bandwidth using random slices of data and lightweight GCV within each slice
+   - `num_slices`: Controls number of random data slices (default: 60)
+   - `num_h_points`: Controls bandwidth candidates per slice (default: 40)
+   
 2. **Phase II**: Fixes the smoothing operator and repeatedly applies it, selecting optimal iterations via discrete GCV
 
 This reformulation preserves the adaptivity of GCV while converting costly continuous bandwidth search into lightweight discrete selection.
 
 ## Main Functions
 
-- `SNP(x, y)`: Main Stepwise Noise Peeling algorithm
-- `DGCV(x, y)`: Direct Generalized Cross-Validation (reference method)  
+- `SNP(x, y, num_h_points=40, num_slices=60)`: Main Stepwise Noise Peeling algorithm
+- `DGCV(x, y, num_h_points=50)`: Direct Generalized Cross-Validation (reference method)  
 - `construct_W(x, h)`: Construct Gaussian kernel weight matrix
 - `example_stepwise()`: Stepwise function demonstration
 - `example_wavy()`: Complex wavy function demonstration
@@ -90,6 +110,7 @@ For datasets with n > 1000, SNP typically shows:
 - **Speed**: Orders of magnitude faster than DGCV
 - **Accuracy**: < 1% difference in RMSE compared to DGCV
 - **Memory**: More efficient memory usage due to iterative approach
+- **Scalability**: Parameter tuning allows adaptation to computational constraints
 
 ## Examples
 
