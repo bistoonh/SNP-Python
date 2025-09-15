@@ -17,7 +17,7 @@ Key Features:
 from .core import SNP, DGCV, construct_W
 from .examples import example_stepwise, example_wavy, example_california_housing
 
-__version__ = "0.1.0"
+__version__ = "0.2.2"
 __author__ = "Bistoon Hosseini"
 __email__ = "bistoon.hosseini@gmail.com"
 

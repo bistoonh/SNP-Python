@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="snp",
-    version="0.1.0",
+    version="0.2.2",
     author="Bistoon Hosseini",
     author_email="bistoon.hosseini@gmail.com",
     description="Stepwise Noise Peeling for Nadaraya-Watson Regression",

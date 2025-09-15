@@ -13,7 +13,7 @@ You can install the development version of SNP from GitHub with:
 
 ```bash
 # Install from GitHub
-pip install https://github.com/bistoonh/SNP-Python/releases/download/v0.1.0/pysnp-0.1.0-py3-none-any.whl
+pip install https://github.com/bistoonh/SNP-Python/releases/download/v0.2.2/pysnp-0.2.2-py3-none-any.whl
 
 # Or install from PyPI (when published)
 pip install pysnp
