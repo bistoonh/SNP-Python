@@ -12,7 +12,7 @@ The **SNP** package implements the Stepwise Noise Peeling algorithm that bypasse
 You can install the development version of SNP from GitHub with:
 
 ```bash
-# Install from PyPI (when published)
+# Install from PyPI
 pip install pysnp
 ```
 
