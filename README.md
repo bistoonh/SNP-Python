@@ -61,10 +61,10 @@ SNP provides two key parameters for balancing speed and accuracy:
 
 ```python
 # Faster computation (fewer bandwidth candidates and slices)
-snp_fast = SNP(x, y, num_h_points=20, num_slices=30)
+snp_fast = SNP(x, y, num_h_points=25, num_slices=25)
 
 # More thorough search (more bandwidth candidates and slices)  
-snp_thorough = SNP(x, y, num_h_points=60, num_slices=100)
+snp_thorough = SNP(x, y, num_h_points=50, num_slices=100)
 
 # Performance comparison
 print(f"Fast SNP time: {snp_fast['time_elapsed']:.4f} seconds")
