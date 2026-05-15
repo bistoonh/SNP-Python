@@ -8,18 +8,13 @@ Compares runtime of:
 
 for increasing sample sizes and dimensions.
 
-Outputs:
-    runtime_results_raw.csv
-    runtime_results_mean.csv
-    runtime_comparison.png
-    runtime_comparison.pdf
+Returns a dictionary with 'raw' and 'means' DataFrames.
 """
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pathlib import Path
 from matplotlib.gridspec import GridSpec
 
 from snpreg import nw_direct_gcv, nw_snp, rmse, mape_shift
@@ -80,41 +75,9 @@ def generate_data(n, d, noise_scale=0.2, rng=None):
 # Helpers
 # --------------------------------------------------
 
-def _save_progress(records, output_dir):
+def _make_plot(df_mean):
     """
-    Save raw and aggregated runtime results to CSV.
-    """
-    df_raw = pd.DataFrame(records)
-
-    raw_path = output_dir / "runtime_results_raw.csv"
-    mean_path = output_dir / "runtime_results_mean.csv"
-
-    df_raw.to_csv(raw_path, index=False)
-
-    if len(df_raw) == 0:
-        df_mean = pd.DataFrame(
-            columns=["dim", "n", "method", "rmse", "mape_shift", "time_elapsed", "n_rep"]
-        )
-    else:
-        df_mean = (
-            df_raw
-            .groupby(["dim", "n", "method"], as_index=False)
-            .agg(
-                rmse=("rmse", "mean"),
-                mape_shift=("mape_shift", "mean"),
-                time_elapsed=("time_elapsed", "mean"),
-                n_rep=("rep", "count")
-            )
-        )
-
-    df_mean.to_csv(mean_path, index=False)
-
-    return df_raw, df_mean
-
-
-def _make_plot(df_mean, output_dir):
-    """
-    Build and save summary plot.
+    Build and display summary plot.
     """
     if df_mean.empty:
         print("[runtime_benchmark] No results available for plotting.")
@@ -183,15 +146,6 @@ def _make_plot(df_mean, output_dir):
 
     fig.tight_layout()
 
-    png_path = output_dir / "runtime_comparison.png"
-    pdf_path = output_dir / "runtime_comparison.pdf"
-
-    fig.savefig(png_path, dpi=300, bbox_inches="tight")
-    fig.savefig(pdf_path, bbox_inches="tight")
-
-    print(f"[runtime_benchmark] Plot saved to: {png_path.resolve()}")
-    print(f"[runtime_benchmark] Plot saved to: {pdf_path.resolve()}")
-
     plt.show()
 
 
@@ -203,14 +157,20 @@ def runtime_benchmark(
     n_list=(500, 1500, 3000, 8000, 13000, 20000, 30000),
     dims=(1, 2, 3),
     n_rep=10,
-    seed=111,
-    output_dir="runtime_results"
+    seed=111
 ):
-    # مسیر ذخیره‌سازی
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    print(f"[runtime_benchmark] Saving outputs to: {output_dir.resolve()}")
+    """
+    Run runtime benchmark across different sample sizes and dimensions.
+    
+    For each (n, d) combination, runs n_rep repetitions and records:
+    - RMSE and MAPE for both DGCV and SNP methods
+    - Elapsed time for bandwidth selection
+    
+    Returns:
+        dict with keys:
+            'raw': DataFrame with all repetitions
+            'means': DataFrame with aggregated means
+    """
 
     records = []
 
@@ -221,19 +181,19 @@ def runtime_benchmark(
 
             for rep in range(1, n_rep + 1):
                 # ------------------------------------------------------
-                # 1. ایجاد Seed منحصربه‌فرد برای این تکرار خاص
-                # این کار باعث می‌شود rep=1 همیشه نتیجه یکسانی بدهد، 
-                # چه تنها اجرا شود چه در یک لیست بزرگ.
+                # 1. Generate unique seed for this specific repetition
+                # This ensures rep=1 always gives the same result,
+                # whether run alone or in a large list.
                 # ------------------------------------------------------
                 current_seed = seed + (n * 10000) + (d * 1000) + rep
                 
-                # تنظیم رندوم سراسری برای توابع داخلی (مثل DGCV random mode)
+                # Set global random seed for internal functions (e.g., DGCV random mode)
                 np.random.seed(current_seed)
                 
-                # ایجاد RNG محلی برای تولید دیتا
+                # Create local RNG for data generation
                 local_rng = np.random.default_rng(current_seed)
 
-                # تولید دیتا با استفاده از RNG محلی
+                # Generate data using local RNG
                 X, y, y_true = generate_data(
                     n=n,
                     d=d,
@@ -246,8 +206,8 @@ def runtime_benchmark(
                 # -----------------------------
                 # Direct GCV
                 # -----------------------------
-                # چون قبل از این خط np.random.seed زدیم، 
-                # حالت random این تابع هم فیکس می‌شود.
+                # Since we set np.random.seed before this line,
+                # the random mode of this function is also fixed.
                 out_dg = nw_direct_gcv(
                     X,
                     y,
@@ -289,14 +249,36 @@ def runtime_benchmark(
                     "time_elapsed": out_snp["time_elapsed"]
                 })
 
-            # ذخیره تدریجی
-            df_raw, df_mean = _save_progress(records, output_dir)
+    # Build DataFrames
+    df_raw = pd.DataFrame(records)
 
-    # رسم پلات نهایی
-    _make_plot(df_mean, output_dir)
+    if len(df_raw) == 0:
+        df_means = pd.DataFrame(
+            columns=["dim", "n", "method", "rmse", "mape_shift", "time_elapsed", "n_rep"]
+        )
+    else:
+        df_means = (
+            df_raw
+            .groupby(["dim", "n", "method"], as_index=False)
+            .agg(
+                rmse=("rmse", "mean"),
+                mape_shift=("mape_shift", "mean"),
+                time_elapsed=("time_elapsed", "mean"),
+                n_rep=("rep", "count")
+            )
+        )
 
-    return df_raw, df_mean
+    # Display aggregated results
+    print("\n" + "="*60)
+    print("AGGREGATED RESULTS (Mean across repetitions)")
+    print("="*60)
+    print(df_means)
+    print("="*60)
 
-
-if __name__ == "__main__":
-    runtime_benchmark()
+    # Plot results
+    _make_plot(df_means)
+    
+    return {
+        "raw": df_raw,
+        "means": df_means
+    }
