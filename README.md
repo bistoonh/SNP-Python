@@ -81,7 +81,7 @@ import snpreg
 np.random.seed(111)
 n = 2000
 
-X = np.random.uniform(0, 4*np.pi, n)
+X = np.sort(np.random.uniform(0, 4*np.pi, n))
 Y_true = np.sin(2*X)
 Y = Y_true + np.random.normal(0, 0.3, n)
 
@@ -131,19 +131,30 @@ plt.show()
 
 The package includes reproducible experiments from the paper. These functions run comprehensive benchmarks and generate publication-quality figures:
 
+### Run runtime benchmark
 ```python
 import snpreg
 
-# Run runtime benchmark
 snpreg.runtime_benchmark()
+```
 
-# Run mixture experiment (synthetic data)
+### Run mixture experiment (synthetic data)
+```python
+import snpreg
+
 snpreg.mixture_experiment()
+```
+### Run 1D real data experiment
+```python
+import snpreg
 
-# Run 1D real data experiment
 snpreg.realdata_1d()
+```
 
-# Run 2D real data experiment
+### Run 2D real data experiment
+```python
+import snpreg
+
 snpreg.realdata_2d()
 ```
 
