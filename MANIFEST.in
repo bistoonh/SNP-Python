@@ -1,0 +1,15 @@
+include README.md
+
+include LICENSE
+
+include pyproject.toml
+
+recursive-include snpreg *.py
+
+recursive-include snpreg/datasets *.csv
+
+recursive-include snpreg/experiments *.py
+
+global-exclude pycache
+
+global-exclude *.py[co]
