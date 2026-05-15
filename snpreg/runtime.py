@@ -13,6 +13,9 @@ Returns a dictionary with 'raw' and 'means' DataFrames.
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
+from matplotlib.gridspec import GridSpec
 
 from snpreg import nw_direct_gcv, nw_snp, rmse, mape_shift
 
@@ -69,6 +72,84 @@ def generate_data(n, d, noise_scale=0.2, rng=None):
 
 
 # --------------------------------------------------
+# Helpers
+# --------------------------------------------------
+
+def _make_plot(df_mean):
+    """
+    Build and display summary plot.
+    """
+    if df_mean.empty:
+        print("[runtime_benchmark] No results available for plotting.")
+        return
+
+    methods = list(df_mean["method"].unique())
+    dims_sorted = sorted(df_mean["dim"].unique())
+
+    fig = plt.figure(figsize=(11, 7))
+    gs = GridSpec(2, 2, figure=fig)
+
+    ax_time = fig.add_subplot(gs[0, :])
+    ax_rmse = fig.add_subplot(gs[1, 0])
+    ax_mape = fig.add_subplot(gs[1, 1])
+
+    for d in dims_sorted:
+        df_d = df_mean[df_mean["dim"] == d]
+
+        for method in methods:
+            df_dm = df_d[df_d["method"] == method].sort_values("n")
+
+            if df_dm.empty:
+                continue
+
+            label = f"{method} (d={d})"
+
+            ax_time.plot(
+                df_dm["n"],
+                df_dm["time_elapsed"],
+                marker="o",
+                linewidth=2,
+                label=label
+            )
+
+            ax_rmse.plot(
+                df_dm["n"],
+                df_dm["rmse"],
+                marker="o",
+                linewidth=2,
+                label=label
+            )
+
+            ax_mape.plot(
+                df_dm["n"],
+                df_dm["mape_shift"],
+                marker="o",
+                linewidth=2,
+                label=label
+            )
+
+    ax_time.set_title("Runtime vs Sample Size")
+    ax_time.set_xlabel("n")
+    ax_time.set_ylabel("Time (seconds)")
+    ax_time.grid(True, alpha=0.3)
+    ax_time.legend(ncol=3, fontsize=9)
+
+    ax_rmse.set_title("RMSE vs Sample Size")
+    ax_rmse.set_xlabel("n")
+    ax_rmse.set_ylabel("RMSE")
+    ax_rmse.grid(True, alpha=0.3)
+
+    ax_mape.set_title("MAPE vs Sample Size")
+    ax_mape.set_xlabel("n")
+    ax_mape.set_ylabel("MAPE (%)")
+    ax_mape.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+
+    plt.show()
+
+
+# --------------------------------------------------
 # Runtime experiment
 # --------------------------------------------------
 
@@ -99,7 +180,11 @@ def runtime_benchmark(
             print(f"[runtime_benchmark] Starting dimension d = {d}")
 
             for rep in range(1, n_rep + 1):
-                # Generate unique seed for this specific repetition
+                # ------------------------------------------------------
+                # 1. Generate unique seed for this specific repetition
+                # This ensures rep=1 always gives the same result,
+                # whether run alone or in a large list.
+                # ------------------------------------------------------
                 current_seed = seed + (n * 10000) + (d * 1000) + rep
                 
                 # Set global random seed for internal functions (e.g., DGCV random mode)
@@ -121,6 +206,8 @@ def runtime_benchmark(
                 # -----------------------------
                 # Direct GCV
                 # -----------------------------
+                # Since we set np.random.seed before this line,
+                # the random mode of this function is also fixed.
                 out_dg = nw_direct_gcv(
                     X,
                     y,
@@ -181,20 +268,17 @@ def runtime_benchmark(
             )
         )
 
+    # Display aggregated results
     print("\n" + "="*60)
     print("AGGREGATED RESULTS (Mean across repetitions)")
     print("="*60)
     print(df_means)
     print("="*60)
 
+    # Plot results
+    _make_plot(df_means)
+    
     return {
         "raw": df_raw,
         "means": df_means
     }
-
-
-if __name__ == "__main__":
-    res = runtime_benchmark(n_list=(300, 450), dims=(1,))
-    print("\n\nAccess results via:")
-    print("  res['means']")
-    print("  res['raw']")
