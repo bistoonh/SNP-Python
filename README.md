@@ -164,15 +164,30 @@ snpreg.realdata_2d()
 SNP provides two key parameters for balancing speed and accuracy:
 
 ```python
+import numpy as np
+import matplotlib.pyplot as plt
+import snpreg
+
+# Generate noisy sine wave
+np.random.seed(111)
+n = 13000
+
+X = np.random.uniform(0, 4*np.pi, n)
+Y_true = np.sin(2*X)
+Y = Y_true + np.random.normal(0, 0.3, n)
+
 # Faster computation (fewer bandwidth candidates and slices)
-result_fast = snpreg.nw_snp(X, Y, num_h_points=20, num_slices=30)
+result_fast = snpreg.nw_snp(X, Y, num_h_points=20, num_slices=25)
 
 # More thorough search (more bandwidth candidates and slices)
-result_thorough = snpreg.nw_snp(X, Y, num_h_points=60, num_slices=100)
+result_thorough = snpreg.nw_snp(X, Y, num_h_points=50, num_slices=100)
 
 # Performance comparison
-print(f"Fast SNP time: {result_fast['time_elapsed']:.2f} seconds")
-print(f"Thorough SNP time: {result_thorough['time_elapsed']:.2f} seconds")
+rmse_fast = snpreg.rmse(Y_true, result_fast['y_k_opt'])
+rmse_thorough = snpreg.rmse(Y_true, result_thorough['y_k_opt'])
+
+print(f"Fast SNP time: {result_fast['time_elapsed']:.2f} seconds, RMSE: {rmse_fast:.3f}")
+print(f"Thorough SNP time: {result_thorough['time_elapsed']:.2f} seconds, RMSE: {rmse_thorough:.3f}")
 ```
 
 ## License
