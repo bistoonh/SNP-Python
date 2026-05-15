@@ -8,19 +8,11 @@ Compares runtime of:
 
 for increasing sample sizes and dimensions.
 
-Outputs:
-    runtime_results_raw.csv
-    runtime_results_mean.csv
-    runtime_comparison.png
-    runtime_comparison.pdf
+Returns a dictionary with 'raw' and 'means' DataFrames.
 """
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from pathlib import Path
-from matplotlib.gridspec import GridSpec
 
 from snpreg import nw_direct_gcv, nw_snp, rmse, mape_shift
 
@@ -77,125 +69,6 @@ def generate_data(n, d, noise_scale=0.2, rng=None):
 
 
 # --------------------------------------------------
-# Helpers
-# --------------------------------------------------
-
-def _save_progress(records, output_dir):
-    """
-    Save raw and aggregated runtime results to CSV.
-    """
-    df_raw = pd.DataFrame(records)
-
-    raw_path = output_dir / "runtime_results_raw.csv"
-    mean_path = output_dir / "runtime_results_mean.csv"
-
-    df_raw.to_csv(raw_path, index=False)
-
-    if len(df_raw) == 0:
-        df_mean = pd.DataFrame(
-            columns=["dim", "n", "method", "rmse", "mape_shift", "time_elapsed", "n_rep"]
-        )
-    else:
-        df_mean = (
-            df_raw
-            .groupby(["dim", "n", "method"], as_index=False)
-            .agg(
-                rmse=("rmse", "mean"),
-                mape_shift=("mape_shift", "mean"),
-                time_elapsed=("time_elapsed", "mean"),
-                n_rep=("rep", "count")
-            )
-        )
-
-    df_mean.to_csv(mean_path, index=False)
-
-    return df_raw, df_mean
-
-
-def _make_plot(df_mean, output_dir):
-    """
-    Build and save summary plot.
-    """
-    if df_mean.empty:
-        print("[runtime_benchmark] No results available for plotting.")
-        return
-
-    methods = list(df_mean["method"].unique())
-    dims_sorted = sorted(df_mean["dim"].unique())
-
-    fig = plt.figure(figsize=(11, 7))
-    gs = GridSpec(2, 2, figure=fig)
-
-    ax_time = fig.add_subplot(gs[0, :])
-    ax_rmse = fig.add_subplot(gs[1, 0])
-    ax_mape = fig.add_subplot(gs[1, 1])
-
-    for d in dims_sorted:
-        df_d = df_mean[df_mean["dim"] == d]
-
-        for method in methods:
-            df_dm = df_d[df_d["method"] == method].sort_values("n")
-
-            if df_dm.empty:
-                continue
-
-            label = f"{method} (d={d})"
-
-            ax_time.plot(
-                df_dm["n"],
-                df_dm["time_elapsed"],
-                marker="o",
-                linewidth=2,
-                label=label
-            )
-
-            ax_rmse.plot(
-                df_dm["n"],
-                df_dm["rmse"],
-                marker="o",
-                linewidth=2,
-                label=label
-            )
-
-            ax_mape.plot(
-                df_dm["n"],
-                df_dm["mape_shift"],
-                marker="o",
-                linewidth=2,
-                label=label
-            )
-
-    ax_time.set_title("Runtime vs Sample Size")
-    ax_time.set_xlabel("n")
-    ax_time.set_ylabel("Time (seconds)")
-    ax_time.grid(True, alpha=0.3)
-    ax_time.legend(ncol=3, fontsize=9)
-
-    ax_rmse.set_title("RMSE vs Sample Size")
-    ax_rmse.set_xlabel("n")
-    ax_rmse.set_ylabel("RMSE")
-    ax_rmse.grid(True, alpha=0.3)
-
-    ax_mape.set_title("MAPE vs Sample Size")
-    ax_mape.set_xlabel("n")
-    ax_mape.set_ylabel("MAPE (%)")
-    ax_mape.grid(True, alpha=0.3)
-
-    fig.tight_layout()
-
-    png_path = output_dir / "runtime_comparison.png"
-    pdf_path = output_dir / "runtime_comparison.pdf"
-
-    fig.savefig(png_path, dpi=300, bbox_inches="tight")
-    fig.savefig(pdf_path, bbox_inches="tight")
-
-    print(f"[runtime_benchmark] Plot saved to: {png_path.resolve()}")
-    print(f"[runtime_benchmark] Plot saved to: {pdf_path.resolve()}")
-
-    plt.show()
-
-
-# --------------------------------------------------
 # Runtime experiment
 # --------------------------------------------------
 
@@ -203,8 +76,7 @@ def runtime_benchmark(
     n_list=(500, 1500, 3000, 8000, 13000, 20000, 30000),
     dims=(1, 2, 3),
     n_rep=10,
-    seed=111,
-    output_dir="runtime_results"
+    seed=111
 ):
     """
     Run runtime benchmark across different sample sizes and dimensions.
@@ -213,13 +85,11 @@ def runtime_benchmark(
     - RMSE and MAPE for both DGCV and SNP methods
     - Elapsed time for bandwidth selection
     
-    Results are saved incrementally to CSV files and plotted at the end.
+    Returns:
+        dict with keys:
+            'raw': DataFrame with all repetitions
+            'means': DataFrame with aggregated means
     """
-    # Create output directory
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    print(f"[runtime_benchmark] Saving outputs to: {output_dir.resolve()}")
 
     records = []
 
@@ -230,8 +100,6 @@ def runtime_benchmark(
 
             for rep in range(1, n_rep + 1):
                 # Generate unique seed for this specific repetition
-                # This ensures rep=1 always produces the same result,
-                # whether run alone or in a large batch
                 current_seed = seed + (n * 10000) + (d * 1000) + rep
                 
                 # Set global random seed for internal functions (e.g., DGCV random mode)
@@ -253,7 +121,6 @@ def runtime_benchmark(
                 # -----------------------------
                 # Direct GCV
                 # -----------------------------
-                # Random mode is fixed by the seed set above
                 out_dg = nw_direct_gcv(
                     X,
                     y,
@@ -295,21 +162,39 @@ def runtime_benchmark(
                     "time_elapsed": out_snp["time_elapsed"]
                 })
 
-            # Save progress incrementally
-            df_raw, df_mean = _save_progress(records, output_dir)
+    # Build DataFrames
+    df_raw = pd.DataFrame(records)
 
-    # Generate final plot
-    _make_plot(df_mean, output_dir)
+    if len(df_raw) == 0:
+        df_means = pd.DataFrame(
+            columns=["dim", "n", "method", "rmse", "mape_shift", "time_elapsed", "n_rep"]
+        )
+    else:
+        df_means = (
+            df_raw
+            .groupby(["dim", "n", "method"], as_index=False)
+            .agg(
+                rmse=("rmse", "mean"),
+                mape_shift=("mape_shift", "mean"),
+                time_elapsed=("time_elapsed", "mean"),
+                n_rep=("rep", "count")
+            )
+        )
 
-    # Display aggregated results
     print("\n" + "="*60)
     print("AGGREGATED RESULTS (Mean across repetitions)")
     print("="*60)
-    print(df_mean.to_string(index=False))
+    print(df_means)
     print("="*60)
 
-    return df_raw, df_mean
+    return {
+        "raw": df_raw,
+        "means": df_means
+    }
 
 
 if __name__ == "__main__":
-    runtime_benchmark()
+    res = runtime_benchmark(n_list=(300, 450), dims=(1,))
+    print("\n\nAccess results via:")
+    print("  res['means']")
+    print("  res['raw']")
