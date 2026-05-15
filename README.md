@@ -32,9 +32,8 @@ SNP operates in two phases:
 
 Currently, install directly from GitHub:
 ```bash
-git clone https://github.com/bistoonh/SNP-Python.git
-cd SNP-Python
-pip install -e .
+pip install git+https://github.com/bistoonh/SNP-Python.git
+
 
 ### Requirements
 

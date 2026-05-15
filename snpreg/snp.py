@@ -91,26 +91,24 @@ def nw_snp(X, y, num_h_points=30, num_slices=50, X_new=None):
     
     Returns
     -------
-    dict
-        A dictionary containing:
-        - 'y_k_opt' : ndarray, shape (n,)
-            Fitted values on training data after k_opt iterations.
-        - 'y_k_minus_1_opt' : ndarray, shape (n,)
-            Fitted values on training data after (k_opt - 1) iterations.
-        - 'y_new_pred' : ndarray, shape (m, 1) or None
-            Predicted values for X_new. None if X_new is not provided.
-        - 'h_start' : ndarray, shape (d,)
-            Final initial bandwidth vector used in Phase II.
-        - 'k_opt' : int
-            Optimal number of smoothing iterations selected by GCV.
-        - 'gcv_approx_k' : ndarray, shape (k_max,)
-            Approximate GCV scores for k = 1, 2, ..., k_max.
-        - 'traces' : ndarray, shape (k_max,)
-            Approximate trace values for each iteration.
-        - 'time_elapsed' : float
-            Total computation time in seconds.
-        - 'B' : int
-            Total number of bandwidth initialization attempts (including restarts).
+    y_k_opt : ndarray, shape (n,)
+        Fitted values on training data after k_opt iterations.
+    y_k_minus_1_opt : ndarray, shape (n,)
+        Fitted values on training data after (k_opt - 1) iterations.
+    y_new_pred : ndarray, shape (m, 1) or None
+        Predicted values for X_new. None if X_new is not provided.
+    h_start : ndarray, shape (d,)
+        Final initial bandwidth vector used in Phase II.
+    k_opt : int
+        Optimal number of smoothing iterations selected by GCV.
+    gcv_approx_k : ndarray, shape (k_max,)
+        Approximate GCV scores for k = 1, 2, ..., k_max.
+    traces : ndarray, shape (k_max,)
+        Approximate trace values for each iteration.
+    time_elapsed : float
+        Total computation time in seconds.
+    B : int
+        Total number of bandwidth initialization attempts (including restarts).
     
     Notes
     -----
