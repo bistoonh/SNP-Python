@@ -4,7 +4,7 @@ A Python implementation of the Stepwise Noise Peeling (SNP) method for efficient
 
 ## Overview
 
-SNP is a computationally efficient alternative to Generalized Cross-Validation (GCV) for bandwidth selection in nonparametric regression. It transforms the continuous $d$-dimensional bandwidth optimization problem into a discrete one-dimensional path, achieving significant speedups (over $30\times$) while maintaining or improving prediction accuracy.
+SNP is a computationally efficient alternative to Generalized Cross-Validation (GCV) for bandwidth selection in nonparametric regression. It transforms the continuous $d$-dimensional bandwidth optimization problem into a discrete one-dimensional path, achieving significant speedups (up to $30\times$ faster than Direct GCV in large-scale experiments) while maintaining or improving prediction accuracy.
 
 ### Key Features
 
