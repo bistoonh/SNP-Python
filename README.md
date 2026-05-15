@@ -135,7 +135,7 @@ The package includes reproducible experiments from the paper. These functions ru
 ```python
 import snpreg
 
-snpreg.runtime_benchmark(n_list=(500, ), dims=(1, 2, 3))
+snpreg.runtime_benchmark(n_list=(500, 1500), dims=(1, 2, 3))
 ```
 
 ### Run mixture experiment (synthetic data)
