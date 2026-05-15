@@ -162,27 +162,6 @@ result_thorough = snpreg.nw_snp(X, Y, num_h_points=60, num_slices=100)
 print(f"Fast SNP time: {result_fast['time_elapsed']:.2f} seconds")
 print(f"Thorough SNP time: {result_thorough['time_elapsed']:.2f} seconds")
 ```
-## Project Structure
-
-
-SNP-Python/
-├── snpreg/
-│   ├── __init__.py
-│   ├── kernels.py          # Kernel functions and weight matrix
-│   ├── dgcv.py             # Direct GCV implementation
-│   ├── snp.py              # SNP algorithm
-│   ├── metrics.py          # Evaluation metrics
-│   ├── datasets/
-│   │   ├── __init__.py
-│   │   └── housing.csv     # California housing data
-│   └── experiments/
-│       ├── __init__.py
-│       ├── mixture.py      # Mixture experiment
-│       ├── realdata_1d.py  # 1D real data experiment
-│       ├── realdata_2d.py  # 2D real data experiment
-│       └── runtime.py      # Runtime benchmark
-├── pyproject.toml
-└── README.md
 
 ## License
 
