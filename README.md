@@ -165,7 +165,6 @@ SNP provides two key parameters for balancing speed and accuracy:
 
 ```python
 import numpy as np
-import matplotlib.pyplot as plt
 import snpreg
 
 # Generate noisy sine wave
